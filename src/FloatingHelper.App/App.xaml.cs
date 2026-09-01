@@ -2,10 +2,12 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using FloatingHelper.Core.Configuration;
+using FloatingHelper.Core.Logging;
 using FloatingHelper.Core.Plugins;
 using FloatingHelper.Core.Selection;
 using FloatingHelper.Plugins.Builtin;
 using Forms = System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace FloatingHelper.App;
 
@@ -31,10 +33,14 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
+        Logger.EnsureInitialized();
+        Logger.Info("应用启动");
+
         // 单实例保护：已有实例在运行则直接退出。
         _singleInstance = new Mutex(true, SingleInstanceMutexName, out var createdNew);
         if (!createdNew)
         {
+            Logger.Warn("检测到已有实例运行，退出");
             Shutdown();
             return;
         }
@@ -45,9 +51,42 @@ public partial class App : System.Windows.Application
         SetAutoStart(_settings.AutoStart);
 
         SetupTray();
+        SetupHook();
+
+        // 休眠恢复 / 会话解锁后重连全局钩子（低层钩子在系统事件后可能失效）。
+        SystemEvents.PowerModeChanged += OnPowerModeChanged;
+        SystemEvents.SessionSwitch += OnSessionSwitch;
+    }
+
+    private void SetupHook()
+    {
         _hook = new GlobalMouseHook();
         _hook.SelectionFinished += OnSelectionFinished;
+        _hook.MouseDown += OnMouseDown;
         _hook.Start();
+    }
+
+    private void ReconnectHook()
+    {
+        Logger.Info("重连全局钩子");
+        _hook?.Dispose();
+        SetupHook();
+    }
+
+    private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+    {
+        if (e.Mode == PowerModes.Resume)
+        {
+            Dispatcher.InvokeAsync(ReconnectHook);
+        }
+    }
+
+    private void OnSessionSwitch(object sender, SessionSwitchEventArgs e)
+    {
+        if (e.Reason == SessionSwitchReason.SessionUnlock)
+        {
+            Dispatcher.InvokeAsync(ReconnectHook);
+        }
     }
 
     private void LoadSettingsAndPlugins()
@@ -135,9 +174,25 @@ public partial class App : System.Windows.Application
             return;
         }
 
-        // 在拖选结束的触发时刻记录鼠标位置，避免异步显示时位置漂移。
-        var position = GetCursorPos();
+        // 在拖选结束的触发时刻记录鼠标位置（物理像素 → DIP），避免异步显示时位置漂移。
+        var physical = GetCursorPos();
+        var position = DisplayHelper.PhysicalToDip(physical.X, physical.Y);
         Dispatcher.InvokeAsync(() => ShowToolbar(plugins, context, position));
+    }
+
+    /// <summary>左键按下时，若点击在工具栏外区域则关闭工具栏。</summary>
+    private void OnMouseDown((int X, int Y) physicalPoint)
+    {
+        if (_toolbar is null || !_toolbar.IsLoaded)
+        {
+            return;
+        }
+
+        var (x, y) = DisplayHelper.PhysicalToDip(physicalPoint.X, physicalPoint.Y);
+        if (!_toolbar.IsPointOver(x, y))
+        {
+            Dispatcher.InvokeAsync(() => _toolbar?.Close());
+        }
     }
 
     private void ShowToolbar(IReadOnlyList<IPlugin> plugins, PluginContext context, (double X, double Y) position)
@@ -145,15 +200,13 @@ public partial class App : System.Windows.Application
         _toolbar?.Close();
         _toolbar = new ToolbarWindow(plugins, context);
 
-        // 工具栏出现在鼠标位置附近（右下方偏移），并按实际尺寸收敛到屏幕工作区，避免越界。
+        // 工具栏出现在鼠标位置附近（右下方偏移），并按鼠标所在屏幕工作区收敛，避免越界。
         _toolbar.Left = position.X + 12;
         _toolbar.Top = position.Y + 12;
         _toolbar.Show();
         _toolbar.UpdateLayout();
 
-        // 按鼠标所在屏幕做边界收敛，避免多显示器时工具栏被钳制到主屏。
-        var screen = Forms.Screen.FromPoint(new System.Drawing.Point((int)position.X, (int)position.Y));
-        var area = screen.WorkingArea;
+        var area = DisplayHelper.GetWorkAreaDip(position.X, position.Y);
         var left = Math.Clamp(_toolbar.Left, area.Left + 4, area.Right - _toolbar.ActualWidth - 4);
         var top = Math.Clamp(_toolbar.Top, area.Top + 4, area.Bottom - _toolbar.ActualHeight - 4);
         _toolbar.Left = left;
@@ -231,7 +284,7 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(AutoStartKeyPath);
+            using var key = Registry.CurrentUser.CreateSubKey(AutoStartKeyPath);
             if (key is null)
             {
                 return;
@@ -249,22 +302,25 @@ public partial class App : System.Windows.Application
                 key.DeleteValue(AutoStartValueName, throwOnMissingValue: false);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // 注册表写入失败不阻断启动。
+            Logger.Error("设置开机自启失败", ex);
         }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        SystemEvents.PowerModeChanged -= OnPowerModeChanged;
+        SystemEvents.SessionSwitch -= OnSessionSwitch;
         _hook?.Dispose();
         _tray?.Dispose();
         _pluginManager.Dispose();
         _singleInstance?.Dispose();
+        Logger.Info("应用退出");
         base.OnExit(e);
     }
 
-    private static (double X, double Y) GetCursorPos()
+    private static (int X, int Y) GetCursorPos()
     {
         return GetCursorPos(out var pt) ? (pt.X, pt.Y) : (0, 0);
     }

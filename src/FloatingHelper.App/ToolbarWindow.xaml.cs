@@ -1,23 +1,28 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using FloatingHelper.Core.Plugins;
 
 namespace FloatingHelper.App;
 
 /// <summary>
 /// 无边框、置顶、不抢占焦点的浮层工具栏。按钮由适配当前选区的插件动态生成，带图标与悬停反馈。
+/// 无操作 5 秒自动消失，点击工具栏外区域由调用方关闭。
 /// </summary>
 public partial class ToolbarWindow : Window
 {
     private const int GwlExStyle = -20;
     private const int WsExNoActivate = 0x08000000;
     private const int WsExToolWindow = 0x00000080;
+    private static readonly TimeSpan AutoCloseDelay = TimeSpan.FromSeconds(5);
 
     private readonly IReadOnlyList<IPlugin> _plugins;
     private readonly PluginContext _context;
+    private readonly DispatcherTimer _autoCloseTimer;
 
     public ToolbarWindow(IReadOnlyList<IPlugin> plugins, PluginContext context)
     {
@@ -26,6 +31,27 @@ public partial class ToolbarWindow : Window
         _context = context;
         BuildButtons();
         SourceInitialized += (_, _) => ApplyNoActivateStyle();
+
+        _autoCloseTimer = new DispatcherTimer { Interval = AutoCloseDelay };
+        _autoCloseTimer.Tick += (_, _) => Close();
+        _autoCloseTimer.Start();
+
+        // 鼠标悬停在工具栏上时暂停自动关闭，离开后恢复。
+        MouseEnter += (_, _) => _autoCloseTimer.Stop();
+        MouseLeave += (_, _) => _autoCloseTimer.Start();
+    }
+
+    /// <summary>判断指定 DIP 坐标点是否落在工具栏窗口范围内。</summary>
+    public bool IsPointOver(double x, double y)
+    {
+        return x >= Left && x <= Left + ActualWidth
+            && y >= Top && y <= Top + ActualHeight;
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _autoCloseTimer.Stop();
+        base.OnClosed(e);
     }
 
     private void BuildButtons()

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace FloatingHelper.App;
 
 /// <summary>
-/// 低层全局鼠标钩子（WH_MOUSE_LL）：感知「按下左键并移动后抬起」的拖选动作。
+/// 低层全局鼠标钩子（WH_MOUSE_LL）：感知「按下左键并移动后抬起」的拖选动作，以及左键按下位置。
 /// </summary>
 public sealed class GlobalMouseHook : IDisposable
 {
@@ -20,6 +20,9 @@ public sealed class GlobalMouseHook : IDisposable
 
     /// <summary>拖选结束事件（按下左键、产生位移后抬起时触发）。</summary>
     public event Action? SelectionFinished;
+
+    /// <summary>左键按下事件，参数为物理像素坐标。</summary>
+    public event Action<(int X, int Y)>? MouseDown;
 
     public GlobalMouseHook()
     {
@@ -48,6 +51,8 @@ public sealed class GlobalMouseHook : IDisposable
             var msg = (uint)wParam;
             if (msg == WmLButtonDown)
             {
+                var pt = ReadMousePoint(lParam);
+                MouseDown?.Invoke((pt.X, pt.Y));
                 _leftDown = true;
                 _movedWhileDown = false;
             }
@@ -69,6 +74,19 @@ public sealed class GlobalMouseHook : IDisposable
         }
 
         return CallNextHookEx(_hookId, nCode, wParam, lParam);
+    }
+
+    private static (int X, int Y) ReadMousePoint(IntPtr lParam)
+    {
+        try
+        {
+            var s = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+            return (s.Pt.X, s.Pt.Y);
+        }
+        catch
+        {
+            return (0, 0);
+        }
     }
 
     private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
