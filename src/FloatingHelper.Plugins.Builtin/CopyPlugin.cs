@@ -10,6 +10,8 @@ public sealed class CopyPlugin : IPlugin
 
     public string Name => "复制";
 
+    public string Icon => "\uE8C8";
+
     public string Description => "复制选中文本到系统剪贴板";
 
     public bool IsEnabled { get; set; } = true;

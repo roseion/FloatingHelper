@@ -22,6 +22,13 @@ public interface IPlugin
     /// <summary>插件是否提供设置界面。默认 false，不支持设置的插件无需重写。</summary>
     bool HasSettings => false;
 
+    /// <summary>
+    /// 工具栏图标（Segoe MDL2 Assets 字符）。默认通用应用图标。
+    /// 插件可重写此属性提供自定义图标，主程序优先使用插件自带图标，
+    /// 从而新增插件无需修改主程序。
+    /// </summary>
+    string Icon => "\uE71D";
+
     /// <summary>判断当前选区是否适配本插件（决定工具栏是否显示该动作）。</summary>
     bool CanHandle(PluginContext context);
 

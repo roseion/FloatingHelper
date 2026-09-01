@@ -65,7 +65,7 @@ public partial class ToolbarWindow : Window
 
             var icon = new TextBlock
             {
-                Text = GetIcon(plugin.Id),
+                Text = plugin.Icon,
                 FontFamily = new FontFamily("Segoe MDL2 Assets"),
                 FontSize = 14,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -92,17 +92,6 @@ public partial class ToolbarWindow : Window
             ButtonPanel.Children.Add(button);
         }
     }
-
-    /// <summary>按插件 Id 映射 Segoe MDL2 Assets 图标字符。</summary>
-    private static string GetIcon(string pluginId) => pluginId switch
-    {
-        "builtin.copy" => "\uE8C8",      // 复制
-        "builtin.smartopen" => "\uE8A7", // 链接 / 打开
-        "builtin.search" => "\uE721",    // 搜索
-        "builtin.translate" => "\uE774", // Globe / 翻译
-        "builtin.unitconverter" => "\uE9C0", // 尺子 / 单位换算
-        _ => "\uE71D",                    // 通用应用
-    };
 
     private async void OnButtonClick(object sender, RoutedEventArgs e)
     {

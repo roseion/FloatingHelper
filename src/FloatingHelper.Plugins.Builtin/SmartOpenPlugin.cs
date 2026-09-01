@@ -12,6 +12,8 @@ public sealed class SmartOpenPlugin : IPlugin
 
     public string Name => "打开";
 
+    public string Icon => "\uE8A7";
+
     public string Description => "识别选中文本并按对应方式打开（链接 / 文件路径 / 邮箱）";
 
     public bool IsEnabled { get; set; } = true;

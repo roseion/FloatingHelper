@@ -10,6 +10,8 @@ public sealed class SearchPlugin : IPlugin
 
     public string Name => "搜索";
 
+    public string Icon => "\uE721";
+
     public string Description => "使用默认浏览器搜索选中文本";
 
     public bool IsEnabled { get; set; } = true;
