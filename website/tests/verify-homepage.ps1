@@ -43,6 +43,12 @@ Assert ([regex]::IsMatch($html, 'href="https://github\.com/roseion/FloatingHelpe
 $pluginRepoCount = ([regex]::Matches($html, 'github\.com/roseion/FloatingHelper\.Plugins\.Translate')).Count
 Assert ($pluginRepoCount -ge 2) "插件仓库链接出现在插件区块与页脚" ("count=" + $pluginRepoCount)
 
+# ---------- 3.6 GitHub blob 链接分支名（仓库默认分支为 master） ----------
+$badBranch = [regex]::Matches($html, 'github\.com/roseion/[^"#?]*/blob/main/')
+Assert ($badBranch.Count -eq 0) "无指向 main 分支的 GitHub 链接（仓库默认分支是 master）" ("found=" + $badBranch.Count)
+$goodBranch = [regex]::Matches($html, 'github\.com/roseion/FloatingHelper/blob/master/')
+Assert ($goodBranch.Count -ge 2) "文档链接指向 master 分支" ("count=" + $goodBranch.Count)
+
 # ---------- 4. 核心内容区块 ----------
 foreach ($id in @("features", "smartopen", "plugin", "download")) {
     Assert ([regex]::IsMatch($html, 'id="' + $id + '"')) ("包含内容区块 #" + $id)
