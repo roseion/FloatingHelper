@@ -38,6 +38,11 @@ Assert ([regex]::IsMatch($html, 'href="https://github\.com/roseion/FloatingHelpe
 $dlCount = ([regex]::Matches($html, 'github\.com/roseion/FloatingHelper')).Count
 Assert ($dlCount -ge 4) "GitHub 链接出现多次（下载/仓库/文档）" ("count=" + $dlCount)
 
+# ---------- 3.5 插件仓库链接 ----------
+Assert ([regex]::IsMatch($html, 'href="https://github\.com/roseion/FloatingHelper\.Plugins\.Translate"')) "包含翻译插件仓库链接"
+$pluginRepoCount = ([regex]::Matches($html, 'github\.com/roseion/FloatingHelper\.Plugins\.Translate')).Count
+Assert ($pluginRepoCount -ge 2) "插件仓库链接出现在插件区块与页脚" ("count=" + $pluginRepoCount)
+
 # ---------- 4. 核心内容区块 ----------
 foreach ($id in @("features", "smartopen", "plugin", "download")) {
     Assert ([regex]::IsMatch($html, 'id="' + $id + '"')) ("包含内容区块 #" + $id)
