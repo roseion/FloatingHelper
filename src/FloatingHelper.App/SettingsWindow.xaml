@@ -6,6 +6,9 @@
         Width="500" Height="560"
         MinWidth="440" MinHeight="420"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -31,6 +34,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <CheckBox Grid.Column="0"
                                   VerticalAlignment="Center"
@@ -55,6 +59,14 @@
                                        FontSize="12"
                                        TextWrapping="Wrap" />
                         </StackPanel>
+                        <Button Grid.Column="2"
+                                Content="设置"
+                                Padding="10,3"
+                                FontSize="11"
+                                VerticalAlignment="Center"
+                                Margin="8,0,0,0"
+                                Visibility="{Binding HasSettings, Converter={StaticResource BoolToVis}}"
+                                Click="OnSettingsClick" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

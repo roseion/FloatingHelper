@@ -103,6 +103,29 @@ public partial class SettingsWindow : Window
         RefreshList();
     }
 
+    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is not PluginListItem item)
+        {
+            return;
+        }
+
+        if (!item.HasSettings)
+        {
+            return;
+        }
+
+        try
+        {
+            item.Plugin.ShowSettings(this);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, $"打开插件设置失败：{ex.Message}", "浮动助手",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
     private void OnSaveClick(object sender, RoutedEventArgs e)
     {
         _settings.SearchTemplate = SearchTemplateBox.Text.Trim();
@@ -129,6 +152,8 @@ public sealed class PluginListItem
     public string Description => Plugin.Description;
 
     public string Source => IsBuiltin ? "内置" : "外部 DLL";
+
+    public bool HasSettings => Plugin.HasSettings;
 
     public bool IsEnabled
     {
