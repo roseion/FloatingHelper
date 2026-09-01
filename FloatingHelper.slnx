@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FloatingHelper.App/FloatingHelper.App.csproj" />
+    <Project Path="src/FloatingHelper.Core/FloatingHelper.Core.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.Builtin/FloatingHelper.Plugins.Builtin.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FloatingHelper.Core.Tests/FloatingHelper.Core.Tests.csproj" />
+  </Folder>
+</Solution>
