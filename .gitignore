@@ -5,3 +5,8 @@ draft_*/
 bin/
 obj/
 *.user
+
+# 发布产物与安装包编译输出
+publish/
+installer/Output/
+installer/installer/
