@@ -10,3 +10,7 @@ obj/
 publish/
 installer/Output/
 installer/installer/
+
+# 调试临时文件
+err.txt
+out.txt
