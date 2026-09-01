@@ -79,6 +79,24 @@ internal static class DisplayHelper
             (mi.Work.Bottom - mi.Work.Top) * scale);
     }
 
+    /// <summary>将物理像素矩形转换为 WPF DIP 矩形（按矩形左上角所在显示器的 DPI）。</summary>
+    public static Rect PhysicalRectToDip(Rect physical)
+    {
+        var scale = GetDpiScaleAt(physical.X, physical.Y);
+        return new Rect(
+            physical.X * scale,
+            physical.Y * scale,
+            physical.Width * scale,
+            physical.Height * scale);
+    }
+
+    /// <summary>获取指定物理坐标所在显示器的 DPI 缩放比例（96/DPI）。</summary>
+    private static double GetDpiScaleAt(double x, double y)
+    {
+        var pt = new POINT { X = (int)x, Y = (int)y };
+        return GetDpiScale(MonitorFromPoint(pt, MonitorDefaultToNearest));
+    }
+
     private static double GetDpiScale(IntPtr hmon)
     {
         if (hmon == IntPtr.Zero || GetDpiForMonitor(hmon, MdtEffectiveDpi, out var dpiX, out _) != 0)

@@ -24,6 +24,9 @@ public partial class ToolbarWindow : Window
     private readonly PluginContext _context;
     private readonly DispatcherTimer _autoCloseTimer;
 
+    /// <summary>插件执行后返回文本结果时触发（参数：结果文本 + 执行上下文）。</summary>
+    public event Action<string, PluginContext>? PluginResultReady;
+
     public ToolbarWindow(IReadOnlyList<IPlugin> plugins, PluginContext context)
     {
         InitializeComponent();
@@ -96,6 +99,7 @@ public partial class ToolbarWindow : Window
         "builtin.copy" => "\uE8C8",      // 复制
         "builtin.smartopen" => "\uE8A7", // 链接 / 打开
         "builtin.search" => "\uE721",    // 搜索
+        "builtin.translate" => "\uE774", // Globe / 翻译
         _ => "\uE71D",                    // 通用应用
     };
 
@@ -106,17 +110,23 @@ public partial class ToolbarWindow : Window
             return;
         }
 
-        // 插件异常隔离：单个插件失败不影响主程序与其他插件。
+        var context = _context;
+        Close(); // 先关闭工具栏，再执行插件动作
+
+        string? result = null;
         try
         {
-            await plugin.ExecuteAsync(_context);
+            result = await plugin.ExecuteAsync(context);
         }
         catch
         {
-            // 忽略插件异常。
+            // 插件异常隔离：单个插件失败不影响主程序。
         }
 
-        Close();
+        if (!string.IsNullOrEmpty(result))
+        {
+            PluginResultReady?.Invoke(result, context);
+        }
     }
 
     private void ApplyNoActivateStyle()

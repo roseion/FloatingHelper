@@ -26,6 +26,7 @@ public partial class App : System.Windows.Application
     private Mutex? _singleInstance;
     private GlobalMouseHook? _hook;
     private ToolbarWindow? _toolbar;
+    private ResultPopupWindow? _resultPopup;
     private SettingsWindow? _settingsWindow;
     private Forms.NotifyIcon? _tray;
 
@@ -94,10 +95,11 @@ public partial class App : System.Windows.Application
         _settingsPath = SettingsStore.GetDefaultPath();
         _settings = SettingsStore.Load(_settingsPath);
 
-        // 注册内置插件（复制 / 智能打开 / 搜索），搜索插件使用配置的模板。
+        // 注册内置插件（复制 / 智能打开 / 搜索 / 翻译），搜索插件使用配置的模板。
         _pluginManager.AddBuiltin(new CopyPlugin());
         _pluginManager.AddBuiltin(new SmartOpenPlugin());
         _pluginManager.AddBuiltin(new SearchPlugin { SearchTemplate = _settings.SearchTemplate });
+        _pluginManager.AddBuiltin(new TranslatePlugin());
 
         // 恢复插件启停状态，并为缺省配置补齐默认值。
         foreach (var plugin in _pluginManager.Plugins)
@@ -162,10 +164,16 @@ public partial class App : System.Windows.Application
             return;
         }
 
+        // UIA 选区边界为物理像素，转换为 DIP 传给插件。
+        Rect? selectionBounds = selection.Bounds is Rect physicalBounds
+            ? DisplayHelper.PhysicalRectToDip(physicalBounds)
+            : null;
+
         var context = new PluginContext
         {
             SelectedText = selection.Text,
             SourceProcessName = selection.ProcessName,
+            SelectionBounds = selectionBounds,
         };
 
         var plugins = _pluginManager.GetApplicablePlugins(context);
@@ -180,18 +188,19 @@ public partial class App : System.Windows.Application
         Dispatcher.InvokeAsync(() => ShowToolbar(plugins, context, position));
     }
 
-    /// <summary>左键按下时，若点击在工具栏外区域则关闭工具栏。</summary>
+    /// <summary>左键按下时，若点击在工具栏或结果浮层外区域则关闭它们。</summary>
     private void OnMouseDown((int X, int Y) physicalPoint)
     {
-        if (_toolbar is null || !_toolbar.IsLoaded)
-        {
-            return;
-        }
-
         var (x, y) = DisplayHelper.PhysicalToDip(physicalPoint.X, physicalPoint.Y);
-        if (!_toolbar.IsPointOver(x, y))
+
+        if (_toolbar is not null && _toolbar.IsLoaded && !_toolbar.IsPointOver(x, y))
         {
             Dispatcher.InvokeAsync(() => _toolbar?.Close());
+        }
+
+        if (_resultPopup is not null && _resultPopup.IsLoaded && !_resultPopup.IsPointOver(x, y))
+        {
+            Dispatcher.InvokeAsync(() => _resultPopup?.Close());
         }
     }
 
@@ -199,6 +208,7 @@ public partial class App : System.Windows.Application
     {
         _toolbar?.Close();
         _toolbar = new ToolbarWindow(plugins, context);
+        _toolbar.PluginResultReady += OnPluginResultReady;
 
         // 工具栏出现在鼠标位置附近（右下方偏移），并按鼠标所在屏幕工作区收敛，避免越界。
         _toolbar.Left = position.X + 12;
@@ -211,6 +221,42 @@ public partial class App : System.Windows.Application
         var top = Math.Clamp(_toolbar.Top, area.Top + 4, area.Bottom - _toolbar.ActualHeight - 4);
         _toolbar.Left = left;
         _toolbar.Top = top;
+    }
+
+    /// <summary>插件返回文本结果时，在选区下方显示结果浮层。</summary>
+    private void OnPluginResultReady(string result, PluginContext context)
+    {
+        Dispatcher.InvokeAsync(() => ShowResultPopup(result, context));
+    }
+
+    private void ShowResultPopup(string text, PluginContext context)
+    {
+        _resultPopup?.Close();
+        _resultPopup = new ResultPopupWindow(text);
+
+        // 优先显示在选区下方，无选区位置时回退到鼠标位置下方。
+        double left, top;
+        if (context.SelectionBounds is Rect bounds)
+        {
+            left = bounds.Left;
+            top = bounds.Bottom + 6;
+        }
+        else
+        {
+            var physical = GetCursorPos();
+            var pos = DisplayHelper.PhysicalToDip(physical.X, physical.Y);
+            left = pos.X;
+            top = pos.Y + 24;
+        }
+
+        _resultPopup.Left = left;
+        _resultPopup.Top = top;
+        _resultPopup.Show();
+        _resultPopup.UpdateLayout();
+
+        var area = DisplayHelper.GetWorkAreaDip(left, top);
+        _resultPopup.Left = Math.Clamp(_resultPopup.Left, area.Left + 4, area.Right - _resultPopup.ActualWidth - 4);
+        _resultPopup.Top = Math.Clamp(_resultPopup.Top, area.Top + 4, area.Bottom - _resultPopup.ActualHeight - 4);
     }
 
     /// <summary>从程序集资源加载应用图标，失败时回退到系统默认图标。</summary>
@@ -332,6 +378,8 @@ public partial class App : System.Windows.Application
         SystemEvents.PowerModeChanged -= OnPowerModeChanged;
         SystemEvents.SessionSwitch -= OnSessionSwitch;
         _hook?.Dispose();
+        _toolbar?.Close();
+        _resultPopup?.Close();
         _tray?.Dispose();
         _pluginManager.Dispose();
         _singleInstance?.Dispose();
