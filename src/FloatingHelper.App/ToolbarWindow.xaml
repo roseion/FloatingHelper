@@ -26,7 +26,7 @@
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="6"
+                                CornerRadius="0"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
@@ -44,7 +44,7 @@
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="10"
+    <Border CornerRadius="0"
             Padding="5"
             BorderBrush="#E3E3E3"
             BorderThickness="1">

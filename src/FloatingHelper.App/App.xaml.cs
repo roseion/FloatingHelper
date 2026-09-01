@@ -151,7 +151,9 @@ public partial class App : System.Windows.Application
         _toolbar.Show();
         _toolbar.UpdateLayout();
 
-        var area = SystemParameters.WorkArea;
+        // 按鼠标所在屏幕做边界收敛，避免多显示器时工具栏被钳制到主屏。
+        var screen = Forms.Screen.FromPoint(new System.Drawing.Point((int)position.X, (int)position.Y));
+        var area = screen.WorkingArea;
         var left = Math.Clamp(_toolbar.Left, area.Left + 4, area.Right - _toolbar.ActualWidth - 4);
         var top = Math.Clamp(_toolbar.Top, area.Top + 4, area.Bottom - _toolbar.ActualHeight - 4);
         _toolbar.Left = left;

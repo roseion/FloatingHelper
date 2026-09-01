@@ -28,7 +28,7 @@
             <Border Margin="0,16,0,0"
                     Padding="12"
                     Background="#F6F6F6"
-                    CornerRadius="6">
+                    CornerRadius="0">
                 <StackPanel>
                     <TextBlock Foreground="#444444">
                         <Run Text="主页：" />
