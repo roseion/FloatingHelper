@@ -1,0 +1,82 @@
+<Window x:Class="FloatingHelper.App.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="浮动助手 · 插件管理"
+        Width="500" Height="560"
+        MinWidth="440" MinHeight="420"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="插件管理"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   Margin="0,0,0,12" />
+
+        <ListBox Grid.Row="1"
+                 x:Name="PluginList"
+                 BorderBrush="#D0D0D0"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                  Checked="OnPluginToggle"
+                                  Unchecked="OnPluginToggle" />
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                <Border Background="#E8E8E8"
+                                        CornerRadius="3"
+                                        Padding="4,0"
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Source}"
+                                               FontSize="11"
+                                               Foreground="#666666" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Description}"
+                                       Foreground="#888888"
+                                       FontSize="12"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+            <Button Content="加载插件…" Padding="12,6" Click="OnLoadClick" />
+            <Button Content="卸载所选" Padding="12,6" Margin="8,0,0,0" Click="OnUnloadClick" />
+            <Button Content="恢复默认" Padding="12,6" Margin="8,0,0,0" Click="OnRestoreDefaultClick" />
+        </StackPanel>
+
+        <GroupBox Grid.Row="3" Header="搜索设置" Margin="0,16,0,0">
+            <StackPanel>
+                <TextBlock Text="搜索模板（{0} 为查询词占位符）" FontSize="12" Foreground="#888888" />
+                <TextBox x:Name="SearchTemplateBox" Margin="0,6,0,0" Padding="6,4" />
+            </StackPanel>
+        </GroupBox>
+
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button Content="保存设置" Padding="16,6" IsDefault="True" Click="OnSaveClick" />
+        </StackPanel>
+    </Grid>
+</Window>

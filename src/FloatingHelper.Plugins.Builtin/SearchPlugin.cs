@@ -14,11 +14,14 @@ public sealed class SearchPlugin : IPlugin
 
     public bool IsEnabled { get; set; } = true;
 
+    /// <summary>可配置的搜索模板，{0} 为编码后的查询词；为 null 时使用默认模板。</summary>
+    public string? SearchTemplate { get; set; }
+
     public bool CanHandle(PluginContext context) => context.HasMeaningfulText;
 
     public Task<string?> ExecuteAsync(PluginContext context, CancellationToken cancellationToken = default)
     {
-        var url = SearchUrlBuilder.BuildSearchUrl(context.SelectedText);
+        var url = SearchUrlBuilder.BuildSearchUrl(context.SelectedText, SearchTemplate);
         var ok = ProcessLauncher.Open(url);
         return Task.FromResult<string?>(ok ? null : "搜索失败：无法打开浏览器");
     }
