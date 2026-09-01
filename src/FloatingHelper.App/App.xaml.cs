@@ -95,11 +95,10 @@ public partial class App : System.Windows.Application
         _settingsPath = SettingsStore.GetDefaultPath();
         _settings = SettingsStore.Load(_settingsPath);
 
-        // 注册内置插件（复制 / 智能打开 / 搜索 / 翻译），搜索插件使用配置的模板。
+        // 注册内置插件（复制 / 智能打开 / 搜索），搜索插件使用配置的模板。
         _pluginManager.AddBuiltin(new CopyPlugin());
         _pluginManager.AddBuiltin(new SmartOpenPlugin());
         _pluginManager.AddBuiltin(new SearchPlugin { SearchTemplate = _settings.SearchTemplate });
-        _pluginManager.AddBuiltin(new TranslatePlugin());
 
         // 恢复插件启停状态，并为缺省配置补齐默认值。
         foreach (var plugin in _pluginManager.Plugins)
