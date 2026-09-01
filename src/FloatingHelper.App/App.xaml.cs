@@ -225,6 +225,7 @@ public partial class App : System.Windows.Application
     /// <summary>插件返回文本结果时，在选区下方显示结果浮层。</summary>
     private void OnPluginResultReady(string result, PluginContext context)
     {
+        Logger.Info($"[结果浮层] 收到插件结果，长度={result.Length}，选区位置={context.SelectionBounds}");
         Dispatcher.InvokeAsync(() => ShowResultPopup(result, context));
     }
 
@@ -256,6 +257,8 @@ public partial class App : System.Windows.Application
         var area = DisplayHelper.GetWorkAreaDip(left, top);
         _resultPopup.Left = Math.Clamp(_resultPopup.Left, area.Left + 4, area.Right - _resultPopup.ActualWidth - 4);
         _resultPopup.Top = Math.Clamp(_resultPopup.Top, area.Top + 4, area.Bottom - _resultPopup.ActualHeight - 4);
+
+        Logger.Info($"[结果浮层] 已显示，位置=({_resultPopup.Left:F0},{_resultPopup.Top:F0})，大小={_resultPopup.ActualWidth:F0}x{_resultPopup.ActualHeight:F0}");
     }
 
     /// <summary>从程序集资源加载应用图标，失败时回退到系统默认图标。</summary>
