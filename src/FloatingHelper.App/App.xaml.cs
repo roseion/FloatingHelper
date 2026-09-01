@@ -112,8 +112,8 @@ public partial class App : System.Windows.Application
     [StructLayout(LayoutKind.Sequential)]
     private struct POINT
     {
-        public double X;
-        public double Y;
+        public int X;
+        public int Y;
     }
 
     [DllImport("user32.dll")]
