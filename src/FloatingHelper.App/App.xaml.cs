@@ -185,11 +185,7 @@ public partial class App : System.Windows.Application
         menu.Items.Add(autoStartItem);
 
         var aboutItem = new Forms.ToolStripMenuItem("关于");
-        aboutItem.Click += (_, _) => MessageBox.Show(
-            "浮动助手 · 划词工具栏\n\n选中文字后自动弹出工具栏，支持复制 / 智能打开 / 搜索，动作以插件形式扩展。",
-            "关于浮动助手",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        aboutItem.Click += (_, _) => OpenAbout();
         menu.Items.Add(aboutItem);
 
         menu.Items.Add(new Forms.ToolStripSeparator());
@@ -217,6 +213,15 @@ public partial class App : System.Windows.Application
             }
 
             _settingsWindow.Activate();
+        });
+    }
+
+    private void OpenAbout()
+    {
+        Dispatcher.InvokeAsync(() =>
+        {
+            var about = new AboutWindow();
+            about.ShowDialog();
         });
     }
 

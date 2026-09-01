@@ -2,12 +2,13 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
 using FloatingHelper.Core.Plugins;
 
 namespace FloatingHelper.App;
 
 /// <summary>
-/// 无边框、置顶、不抢占焦点的浮层工具栏。按钮由适配当前选区的插件动态生成。
+/// 无边框、置顶、不抢占焦点的浮层工具栏。按钮由适配当前选区的插件动态生成，带图标与悬停反馈。
 /// </summary>
 public partial class ToolbarWindow : Window
 {
@@ -31,19 +32,46 @@ public partial class ToolbarWindow : Window
     {
         foreach (var plugin in _plugins)
         {
+            var content = new StackPanel { Orientation = Orientation.Horizontal };
+
+            var icon = new TextBlock
+            {
+                Text = GetIcon(plugin.Id),
+                FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                FontSize = 14,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 6, 0),
+                Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33)),
+            };
+
+            var label = new TextBlock
+            {
+                Text = plugin.Name,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
+            content.Children.Add(icon);
+            content.Children.Add(label);
+
             var button = new Button
             {
-                Content = plugin.Name,
+                Content = content,
                 Tag = plugin,
-                Margin = new Thickness(4, 0, 4, 0),
-                Padding = new Thickness(12, 6, 12, 6),
-                FontSize = 13,
-                Cursor = System.Windows.Input.Cursors.Hand,
+                Style = (Style)FindResource("ToolbarButton"),
             };
             button.Click += OnButtonClick;
             ButtonPanel.Children.Add(button);
         }
     }
+
+    /// <summary>按插件 Id 映射 Segoe MDL2 Assets 图标字符。</summary>
+    private static string GetIcon(string pluginId) => pluginId switch
+    {
+        "builtin.copy" => "\uE8C8",      // 复制
+        "builtin.smartopen" => "\uE8A7", // 链接 / 打开
+        "builtin.search" => "\uE721",    // 搜索
+        _ => "\uE71D",                    // 通用应用
+    };
 
     private async void OnButtonClick(object sender, RoutedEventArgs e)
     {
