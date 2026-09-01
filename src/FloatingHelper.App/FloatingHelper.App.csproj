@@ -7,11 +7,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FloatingHelper.Core\FloatingHelper.Core.csproj" />
     <ProjectReference Include="..\FloatingHelper.Plugins.Builtin\FloatingHelper.Plugins.Builtin.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="..\..\assets\app.ico">
+      <Link>app.ico</Link>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

@@ -213,15 +213,34 @@ public partial class App : System.Windows.Application
         _toolbar.Top = top;
     }
 
+    /// <summary>从程序集资源加载应用图标，失败时回退到系统默认图标。</summary>
+    private static System.Drawing.Icon LoadAppIcon()
+    {
+        try
+        {
+            var uri = new Uri("pack://application:,,,/app.ico", UriKind.Absolute);
+            var sri = GetResourceStream(uri);
+            if (sri is not null)
+            {
+                return new System.Drawing.Icon(sri.Stream);
+            }
+        }
+        catch
+        {
+            // 回退到系统默认图标。
+        }
+
+        return System.Drawing.SystemIcons.Application;
+    }
+
     private void SetupTray()
     {
         _tray = new Forms.NotifyIcon
         {
-            Icon = System.Drawing.SystemIcons.Application,
+            Icon = LoadAppIcon(),
             Text = "浮动助手",
             Visible = true,
         };
-
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add("浮动助手 · 划词工具栏", null, (_, _) => { }).Enabled = false;
 
