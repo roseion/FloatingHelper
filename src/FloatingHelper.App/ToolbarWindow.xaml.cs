@@ -100,6 +100,7 @@ public partial class ToolbarWindow : Window
         "builtin.smartopen" => "\uE8A7", // 链接 / 打开
         "builtin.search" => "\uE721",    // 搜索
         "builtin.translate" => "\uE774", // Globe / 翻译
+        "builtin.unitconverter" => "\uE9C0", // 尺子 / 单位换算
         _ => "\uE71D",                    // 通用应用
     };
 
