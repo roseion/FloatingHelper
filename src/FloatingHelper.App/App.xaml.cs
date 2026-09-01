@@ -57,18 +57,27 @@ public partial class App : System.Windows.Application
             return;
         }
 
-        Dispatcher.InvokeAsync(() => ShowToolbar(plugins, context));
+        // 在拖选结束的触发时刻记录鼠标位置，避免异步显示时位置漂移。
+        var position = GetCursorPos();
+        Dispatcher.InvokeAsync(() => ShowToolbar(plugins, context, position));
     }
 
-    private void ShowToolbar(IReadOnlyList<IPlugin> plugins, PluginContext context)
+    private void ShowToolbar(IReadOnlyList<IPlugin> plugins, PluginContext context, (double X, double Y) position)
     {
         _toolbar?.Close();
         _toolbar = new ToolbarWindow(plugins, context);
 
-        var pos = GetCursorPos();
-        _toolbar.Left = pos.X + 12;
-        _toolbar.Top = pos.Y + 12;
+        // 工具栏出现在鼠标位置附近（右下方偏移），并按实际尺寸收敛到屏幕工作区，避免越界。
+        _toolbar.Left = position.X + 12;
+        _toolbar.Top = position.Y + 12;
         _toolbar.Show();
+        _toolbar.UpdateLayout();
+
+        var area = SystemParameters.WorkArea;
+        var left = Math.Clamp(_toolbar.Left, area.Left + 4, area.Right - _toolbar.ActualWidth - 4);
+        var top = Math.Clamp(_toolbar.Top, area.Top + 4, area.Bottom - _toolbar.ActualHeight - 4);
+        _toolbar.Left = left;
+        _toolbar.Top = top;
     }
 
     private void SetupTray()
