@@ -11,7 +11,7 @@
 - **全局划词**：在浏览器、记事本、Office 等任意可选中文字的地方拖选，自动弹出工具栏
 - **智能打开**：选中 URL / 邮箱 / 本地文件路径，用系统默认程序打开（图片、音乐、视频等）
 - **复制 / 搜索**：一键复制到剪贴板，或用默认搜索引擎搜索
-- **站点直达**：附六个独立安装的外部插件——小红书 / 知乎 / 微博站内搜索，豆包 / 元宝 / DeepSeek 一键提问；各为一个 DLL，复制到 `plugins/` 即可单独安装，不改主程序
+- **站点直达**：附六个独立安装的外部插件——小红书 / 知乎 / 微博站内搜索，豆包 / 元宝 / DeepSeek 一键提问；各为一个独立仓库、一个 DLL，复制到 `plugins/` 即可单独安装，不改主程序（见下方「插件仓库」）
 - **插件化**：所有动作都是插件，内置插件管理界面，支持加载外部 DLL
 - **多显示器 & 高 DPI**：工具栏跟随鼠标所在屏幕，Per-Monitor DPI 精确定位
 - **托盘常驻**：开机自启、插件管理、关于信息，单实例运行
@@ -69,6 +69,21 @@ FloatingHelper.slnx
     ├── 浮动助手-产品设计文档-MVP.md   # 产品设计文档
     └── 插件设计接口指南.md            # 插件开发指南
 ```
+
+## 插件仓库
+
+浮动助手采用插件化架构，所有动作都是插件。除内置插件（复制 / 智能打开 / 搜索）外，以下是官方维护的独立插件——每个都是独立仓库、独立 DLL，复制到 `plugins/` 即可单独安装，可单独启停 / 卸载，不改主程序：
+
+| 插件 | 仓库 | 说明 |
+|---|---|---|
+| 翻译 | [FloatingHelper.Plugins.Translate](https://github.com/roseion/FloatingHelper.Plugins.Translate) | 选中文字翻译为中文，结果在选区浮层显示 |
+| 单位换算 | [FloatingHelper.Plugins.UnitConverter](https://github.com/roseion/FloatingHelper.Plugins.UnitConverter) | 选中数字+单位自动换算（长度/重量/温度/数据存储） |
+| 小红书搜索 | [FloatingHelper.Plugins.XiaohongshuSearch](https://github.com/roseion/FloatingHelper.Plugins.XiaohongshuSearch) | 用默认浏览器打开小红书站内搜索 |
+| 知乎搜索 | [FloatingHelper.Plugins.ZhihuSearch](https://github.com/roseion/FloatingHelper.Plugins.ZhihuSearch) | 用默认浏览器打开知乎站内搜索 |
+| 微博搜索 | [FloatingHelper.Plugins.WeiboSearch](https://github.com/roseion/FloatingHelper.Plugins.WeiboSearch) | 用默认浏览器打开微博站内搜索 |
+| 向豆包提问 | [FloatingHelper.Plugins.DoubaoAsk](https://github.com/roseion/FloatingHelper.Plugins.DoubaoAsk) | 打开豆包网页版并尝试自动发送提问（复制到剪贴板兜底） |
+| 向元宝提问 | [FloatingHelper.Plugins.YuanbaoAsk](https://github.com/roseion/FloatingHelper.Plugins.YuanbaoAsk) | 打开腾讯元宝对话页并复制提问到剪贴板（粘贴即发送） |
+| 向 DeepSeek 提问 | [FloatingHelper.Plugins.DeepSeekAsk](https://github.com/roseion/FloatingHelper.Plugins.DeepSeekAsk) | 打开 DeepSeek 对话页并复制提问到剪贴板（粘贴即发送） |
 
 ## 插件开发
 
