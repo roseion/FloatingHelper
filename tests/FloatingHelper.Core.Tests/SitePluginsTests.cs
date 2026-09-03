@@ -1,14 +1,20 @@
 using FloatingHelper.Core.Plugins;
-using FloatingHelper.Plugins.SiteLauncher;
+using FloatingHelper.Plugins.DeepSeekAsk;
+using FloatingHelper.Plugins.DoubaoAsk;
+using FloatingHelper.Plugins.WeiboSearch;
+using FloatingHelper.Plugins.XiaohongshuSearch;
+using FloatingHelper.Plugins.YuanbaoAsk;
+using FloatingHelper.Plugins.ZhihuSearch;
 
 namespace FloatingHelper.Core.Tests;
 
 /// <summary>
-/// 站点直达插件（SiteLauncher 外部插件包）测试。
-/// 该插件包不注册进主程序，通过 PluginManager.LoadFromFile 从 DLL 自动发现，
-/// 因此测试重点验证：URL 构造正确 + 插件管理器能独立加载 / 启停 / 卸载全部六个插件。
+/// 六个站点直达插件的测试。每个插件是一个独立的安装包（独立项目、独立 DLL），
+/// 因此测试重点验证：
+///   1) URL 构造正确；
+///   2) 每个 DLL 恰好包含一个插件，可被 PluginManager 单独加载 / 启停 / 卸载（不改主程序）。
 /// </summary>
-public class SiteLauncherPluginTests
+public class SitePluginsTests
 {
     private static PluginContext Ctx(string text) => new() { SelectedText = text };
 
@@ -101,32 +107,64 @@ public class SiteLauncherPluginTests
     }
 
     /// <summary>
-    /// 核心验收点：不修改主程序、不做任何注册，仅把插件 DLL 交给 PluginManager，
-    /// 即可自动发现全部六个站点插件，且每个插件可独立启停与卸载。
+    /// 核心验收点：六个插件是六个独立安装包（独立 DLL）。
+    /// 不修改主程序、不做任何注册，仅把某个插件 DLL 交给 PluginManager，
+    /// 应恰好发现 1 个插件，可独立启停与卸载，与其他插件互不影响。
     /// </summary>
     [Fact]
-    public void PluginManager_LoadFromFile_ShouldDiscoverAllSixSitePlugins()
+    public void PluginManager_LoadFromFile_EachDll_ShouldDiscoverExactlyOnePlugin()
     {
-        var manager = new PluginManager();
-        var dll = typeof(XiaohongshuSearchPlugin).Assembly.Location;
+        foreach (var plugin in AllPlugins)
+        {
+            var manager = new PluginManager();
+            var dll = plugin.GetType().Assembly.Location;
 
-        var loaded = manager.LoadFromFile(dll);
+            var loaded = manager.LoadFromFile(dll);
 
-        Assert.Equal(6, loaded);
-        var sitePlugins = manager.Plugins.Where(p => p.Id.StartsWith("site.", StringComparison.Ordinal)).ToList();
-        Assert.Equal(6, sitePlugins.Count);
+            Assert.Equal(1, loaded);
+            var discovered = Assert.Single(manager.Plugins);
+            Assert.Equal(plugin.Id, discovered.Id);
+            Assert.False(manager.IsBuiltin(discovered));
+            Assert.True(discovered.IsEnabled);
 
-        // 全部按外部插件管理（可卸载），且 Id 唯一。
-        Assert.All(sitePlugins, p => Assert.False(manager.IsBuiltin(p)));
-        Assert.Equal(6, sitePlugins.Select(p => p.Id).Distinct().Count());
+            // 加载后即可适配选区，出现在工具栏。
+            Assert.Single(manager.GetApplicablePlugins(Ctx("测试文字")));
 
-        // 加载后即可适配选区，出现在工具栏。
-        Assert.Equal(6, manager.GetApplicablePlugins(Ctx("测试文字")).Count);
+            // 单个插件可独立卸载，卸载后列表为空。
+            Assert.True(manager.Unload(discovered));
+            Assert.Empty(manager.Plugins);
+        }
+    }
 
-        // 单个插件可独立卸载，其余不受影响。
-        var first = sitePlugins[0];
-        Assert.True(manager.Unload(first));
-        Assert.DoesNotContain(first, manager.Plugins);
-        Assert.Equal(5, manager.Plugins.Count);
+    /// <summary>
+    /// 六个独立 DLL 可同时放入 plugins/ 目录，一次性全部发现（模拟真实安装场景）。
+    /// </summary>
+    [Fact]
+    public void PluginManager_LoadFromDirectory_ShouldDiscoverAllSixDlls()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "FloatingHelper_SitePlugins_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            // 把所有插件 DLL 复制到一个目录，模拟用户把六个安装包放进 plugins/。
+            foreach (var plugin in AllPlugins)
+            {
+                var dll = plugin.GetType().Assembly.Location;
+                File.Copy(dll, Path.Combine(tempDir, Path.GetFileName(dll)));
+            }
+
+            var manager = new PluginManager();
+            var loaded = manager.LoadFromDirectory(tempDir);
+
+            Assert.Equal(6, loaded);
+            var sitePlugins = manager.Plugins.Where(p => p.Id.StartsWith("site.", StringComparison.Ordinal)).ToList();
+            Assert.Equal(6, sitePlugins.Count);
+            Assert.Equal(6, sitePlugins.Select(p => p.Id).Distinct().Count());
+            Assert.All(sitePlugins, p => Assert.False(manager.IsBuiltin(p)));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
     }
 }

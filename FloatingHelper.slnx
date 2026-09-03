@@ -3,7 +3,12 @@
     <Project Path="src/FloatingHelper.App/FloatingHelper.App.csproj" />
     <Project Path="src/FloatingHelper.Core/FloatingHelper.Core.csproj" />
     <Project Path="src/FloatingHelper.Plugins.Builtin/FloatingHelper.Plugins.Builtin.csproj" />
-    <Project Path="src/FloatingHelper.Plugins.SiteLauncher/FloatingHelper.Plugins.SiteLauncher.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.XiaohongshuSearch/FloatingHelper.Plugins.XiaohongshuSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.ZhihuSearch/FloatingHelper.Plugins.ZhihuSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.WeiboSearch/FloatingHelper.Plugins.WeiboSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.DoubaoAsk/FloatingHelper.Plugins.DoubaoAsk.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.YuanbaoAsk/FloatingHelper.Plugins.YuanbaoAsk.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.DeepSeekAsk/FloatingHelper.Plugins.DeepSeekAsk.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FloatingHelper.Core.Tests/FloatingHelper.Core.Tests.csproj" />

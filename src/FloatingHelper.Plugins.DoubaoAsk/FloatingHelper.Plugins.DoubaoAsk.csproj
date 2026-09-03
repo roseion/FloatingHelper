@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>FloatingHelper.Plugins.DoubaoAsk</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FloatingHelper.Core\FloatingHelper.Core.csproj" />
+  </ItemGroup>
+
+  <!-- 便利步骤：构建后把插件 DLL 自动拷入 App 输出目录的 plugins/ 文件夹。 -->
+  <Target Name="CopyToAppPlugins" AfterTargets="Build">
+    <PropertyGroup>
+      <_AppPluginsDir>$(MSBuildProjectDirectory)\..\FloatingHelper.App\bin\$(Configuration)\net8.0-windows\plugins</_AppPluginsDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(_AppPluginsDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(_AppPluginsDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

@@ -21,7 +21,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\FloatingHelper.Core\FloatingHelper.Core.csproj" />
     <ProjectReference Include="..\..\src\FloatingHelper.Plugins.Builtin\FloatingHelper.Plugins.Builtin.csproj" />
-    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.SiteLauncher\FloatingHelper.Plugins.SiteLauncher.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.XiaohongshuSearch\FloatingHelper.Plugins.XiaohongshuSearch.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.ZhihuSearch\FloatingHelper.Plugins.ZhihuSearch.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.WeiboSearch\FloatingHelper.Plugins.WeiboSearch.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.DoubaoAsk\FloatingHelper.Plugins.DoubaoAsk.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.YuanbaoAsk\FloatingHelper.Plugins.YuanbaoAsk.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.DeepSeekAsk\FloatingHelper.Plugins.DeepSeekAsk.csproj" />
   </ItemGroup>
 
 </Project>

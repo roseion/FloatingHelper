@@ -4,18 +4,14 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- 站点直达插件包：编译产物 FloatingHelper.Plugins.SiteLauncher.dll
-         复制到浮动助手 plugins/ 目录即可自动加载，无需修改主程序。 -->
-    <AssemblyName>FloatingHelper.Plugins.SiteLauncher</AssemblyName>
-    <RootNamespace>FloatingHelper.Plugins.SiteLauncher</RootNamespace>
+    <RootNamespace>FloatingHelper.Plugins.ZhihuSearch</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FloatingHelper.Core\FloatingHelper.Core.csproj" />
   </ItemGroup>
 
-  <!-- 便利步骤：构建后把插件 DLL 自动拷入 App 输出目录的 plugins/ 文件夹，
-       主程序无需任何注册，启动时自动扫描加载；不想自动安装可删除本 Target。 -->
+  <!-- 便利步骤：构建后把插件 DLL 自动拷入 App 输出目录的 plugins/ 文件夹。 -->
   <Target Name="CopyToAppPlugins" AfterTargets="Build">
     <PropertyGroup>
       <_AppPluginsDir>$(MSBuildProjectDirectory)\..\FloatingHelper.App\bin\$(Configuration)\net8.0-windows\plugins</_AppPluginsDir>

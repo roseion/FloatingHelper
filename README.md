@@ -11,7 +11,7 @@
 - **全局划词**：在浏览器、记事本、Office 等任意可选中文字的地方拖选，自动弹出工具栏
 - **智能打开**：选中 URL / 邮箱 / 本地文件路径，用系统默认程序打开（图片、音乐、视频等）
 - **复制 / 搜索**：一键复制到剪贴板，或用默认搜索引擎搜索
-- **站点直达**：附带外部插件包 SiteLauncher——小红书 / 知乎 / 微博站内搜索，豆包 / 元宝 / DeepSeek 一键提问，复制 DLL 到 `plugins/` 即可安装，不改主程序
+- **站点直达**：附六个独立安装的外部插件——小红书 / 知乎 / 微博站内搜索，豆包 / 元宝 / DeepSeek 一键提问；各为一个 DLL，复制到 `plugins/` 即可单独安装，不改主程序
 - **插件化**：所有动作都是插件，内置插件管理界面，支持加载外部 DLL
 - **多显示器 & 高 DPI**：工具栏跟随鼠标所在屏幕，Per-Monitor DPI 精确定位
 - **托盘常驻**：开机自启、插件管理、关于信息，单实例运行
@@ -57,7 +57,12 @@ FloatingHelper.slnx
 │   ├── FloatingHelper.Core/          # 核心：插件接口、配置、选区捕获、工具类
 │   ├── FloatingHelper.App/           # WPF 主程序：钩子、工具栏、托盘、设置
 │   ├── FloatingHelper.Plugins.Builtin/ # 内置插件：复制/智能打开/搜索
-│   └── FloatingHelper.Plugins.SiteLauncher/ # 外部插件包：小红书/知乎/微博搜索 + 豆包/元宝/DeepSeek 提问
+│   ├── FloatingHelper.Plugins.XiaohongshuSearch/ # 外部插件①：小红书搜索
+│   ├── FloatingHelper.Plugins.ZhihuSearch/       # 外部插件②：知乎搜索
+│   ├── FloatingHelper.Plugins.WeiboSearch/       # 外部插件③：微博搜索
+│   ├── FloatingHelper.Plugins.DoubaoAsk/         # 外部插件④：向豆包提问
+│   ├── FloatingHelper.Plugins.YuanbaoAsk/        # 外部插件⑤：向元宝提问
+│   └── FloatingHelper.Plugins.DeepSeekAsk/       # 外部插件⑥：向 DeepSeek 提问
 ├── tests/
 │   └── FloatingHelper.Core.Tests/    # xUnit 单元测试
 └── docs/
