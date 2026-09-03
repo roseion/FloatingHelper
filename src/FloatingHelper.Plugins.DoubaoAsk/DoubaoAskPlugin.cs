@@ -6,8 +6,9 @@ using FloatingHelper.Core.Plugins;
 namespace FloatingHelper.Plugins.DoubaoAsk;
 
 /// <summary>
-/// 豆包提问插件：打开豆包网页版，并通过官方 url-action 协议把选中文本作为提问自动发送。
-/// 页面加载完成后会自动在对话输入框填入并提交，无需再手动粘贴。
+/// 豆包提问插件：打开豆包网页版，并通过官方 url-action 协议尝试把选中文本作为提问自动发送；
+/// 同时把提问复制到剪贴板兜底。已登录豆包网页版时页面加载后会自动填入并提交，
+/// 未登录或协议失效时粘贴（Ctrl+V）并回车即可发送。
 /// </summary>
 public sealed class DoubaoAskPlugin : IPlugin
 {
@@ -23,7 +24,7 @@ public sealed class DoubaoAskPlugin : IPlugin
 
     public string Icon => "\uE72E";
 
-    public string Description => "打开豆包网页版并自动发送选中文本作为提问";
+    public string Description => "打开豆包网页版并尝试自动发送选中文本，同时复制到剪贴板兜底";
 
     public bool IsEnabled { get; set; } = true;
 
@@ -52,7 +53,18 @@ public sealed class DoubaoAskPlugin : IPlugin
 
     public Task<string?> ExecuteAsync(PluginContext context, CancellationToken cancellationToken = default)
     {
-        var ok = ProcessLauncher.Open(BuildUrl(context.SelectedText));
-        return Task.FromResult<string?>(ok ? null : "打开失败：无法启动浏览器");
+        // url-action 协议在已登录豆包网页版时可自动填入并发送；
+        // 同时把提问复制到剪贴板兜底，即使未登录 / 协议失效，粘贴后回车即可发送。
+        var opened = ProcessLauncher.Open(BuildUrl(context.SelectedText));
+        var copied = ClipboardHelper.CopyText(context.SelectedText);
+
+        if (!opened)
+        {
+            return Task.FromResult<string?>("打开失败：无法启动浏览器");
+        }
+
+        return Task.FromResult<string?>(copied
+            ? "已打开豆包并尝试自动发送，提问已复制到剪贴板（如未自动发送，粘贴后回车即可）"
+            : "已打开豆包并尝试自动发送");
     }
 }

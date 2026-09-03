@@ -74,10 +74,10 @@ public class SitePluginsTests
     }
 
     [Fact]
-    public void DeepSeekAskPlugin_BuildUrl_ShouldEncodeQuestion()
+    public void DeepSeekAskPlugin_BuildUrl_ShouldPointToChatPage()
     {
         var url = new DeepSeekAskPlugin().BuildUrl("什么是 YOLO");
-        Assert.Equal("https://chat.deepseek.com/a/chat?q=%E4%BB%80%E4%B9%88%E6%98%AF%20YOLO", url);
+        Assert.Equal("https://chat.deepseek.com/a/chat", url);
     }
 
     [Fact]
