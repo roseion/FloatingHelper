@@ -1,11 +1,11 @@
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>小红书搜索插件：用默认浏览器在「小红书」中搜索选中文本。</summary>
 public sealed class XiaohongshuSearchPlugin : UrlLaunchPluginBase
 {
-    public override string Id => "builtin.search.xiaohongshu";
+    public override string Id => "site.search.xiaohongshu";
 
     public override string Name => "小红书";
 

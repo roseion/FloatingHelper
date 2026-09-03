@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\FloatingHelper.Core\FloatingHelper.Core.csproj" />
     <ProjectReference Include="..\..\src\FloatingHelper.Plugins.Builtin\FloatingHelper.Plugins.Builtin.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.SiteLauncher\FloatingHelper.Plugins.SiteLauncher.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,11 @@
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>微博搜索插件：用默认浏览器在「微博」中搜索选中文本。</summary>
 public sealed class WeiboSearchPlugin : UrlLaunchPluginBase
 {
-    public override string Id => "builtin.search.weibo";
+    public override string Id => "site.search.weibo";
 
     public override string Name => "微博";
 

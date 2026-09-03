@@ -1,11 +1,11 @@
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>知乎搜索插件：用默认浏览器在「知乎」中搜索选中文本。</summary>
 public sealed class ZhihuSearchPlugin : UrlLaunchPluginBase
 {
-    public override string Id => "builtin.search.zhihu";
+    public override string Id => "site.search.zhihu";
 
     public override string Name => "知乎";
 

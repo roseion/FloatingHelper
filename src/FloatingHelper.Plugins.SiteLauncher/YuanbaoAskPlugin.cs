@@ -1,7 +1,7 @@
 using FloatingHelper.Core.Actions;
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>
 /// 腾讯元宝提问插件：打开元宝网页对话页，并把选中文本复制到剪贴板。
@@ -12,7 +12,7 @@ public sealed class YuanbaoAskPlugin : UrlLaunchPluginBase
 {
     private const string ChatPageUrl = "https://yuanbao.tencent.com/chat/";
 
-    public override string Id => "builtin.ask.yuanbao";
+    public override string Id => "site.ask.yuanbao";
 
     public override string Name => "元宝";
 

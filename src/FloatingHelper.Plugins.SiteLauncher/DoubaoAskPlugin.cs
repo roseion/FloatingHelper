@@ -2,7 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>
 /// 豆包提问插件：打开豆包网页版，并通过官方 url-action 协议把选中文本作为提问自动发送。
@@ -16,7 +16,7 @@ public sealed class DoubaoAskPlugin : UrlLaunchPluginBase
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    public override string Id => "builtin.ask.doubao";
+    public override string Id => "site.ask.doubao";
 
     public override string Name => "豆包";
 

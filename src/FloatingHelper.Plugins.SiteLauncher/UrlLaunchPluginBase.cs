@@ -1,7 +1,7 @@
 using FloatingHelper.Core.Actions;
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>
 /// 「用默认浏览器打开指定网站页面」类插件的公共基类。

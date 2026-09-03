@@ -1,7 +1,6 @@
-using FloatingHelper.Core.Actions;
 using FloatingHelper.Core.Plugins;
 
-namespace FloatingHelper.Plugins.Builtin;
+namespace FloatingHelper.Plugins.SiteLauncher;
 
 /// <summary>
 /// DeepSeek 提问插件：打开 DeepSeek 网页对话，并带上选中文本（q 参数）。
@@ -10,7 +9,7 @@ namespace FloatingHelper.Plugins.Builtin;
 /// </summary>
 public sealed class DeepSeekAskPlugin : UrlLaunchPluginBase
 {
-    public override string Id => "builtin.ask.deepseek";
+    public override string Id => "site.ask.deepseek";
 
     public override string Name => "DeepSeek";
 
