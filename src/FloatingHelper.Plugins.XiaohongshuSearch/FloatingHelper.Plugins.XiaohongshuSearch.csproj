@@ -11,14 +11,4 @@
     <ProjectReference Include="..\FloatingHelper.Core\FloatingHelper.Core.csproj" />
   </ItemGroup>
 
-  <!-- 便利步骤：构建后把插件 DLL 自动拷入 App 输出目录的 plugins/ 文件夹，
-       主程序无需任何注册，启动时自动扫描加载；不想自动安装可删除本 Target。 -->
-  <Target Name="CopyToAppPlugins" AfterTargets="Build">
-    <PropertyGroup>
-      <_AppPluginsDir>$(MSBuildProjectDirectory)\..\FloatingHelper.App\bin\$(Configuration)\net8.0-windows\plugins</_AppPluginsDir>
-    </PropertyGroup>
-    <MakeDir Directories="$(_AppPluginsDir)" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(_AppPluginsDir)" SkipUnchangedFiles="true" />
-  </Target>
-
 </Project>
