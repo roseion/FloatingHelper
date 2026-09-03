@@ -5,12 +5,14 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using FloatingHelper.Core.Configuration;
 using FloatingHelper.Core.Plugins;
 
 namespace FloatingHelper.App;
 
 /// <summary>
 /// 无边框、置顶、不抢占焦点的浮层工具栏。按钮由适配当前选区的插件动态生成，带图标与悬停反馈。
+/// 支持三种显示模式：图标+文字 / 仅图标（悬停弹文字）/ 仅文字。
 /// 无操作 5 秒自动消失，点击工具栏外区域由调用方关闭。
 /// </summary>
 public partial class ToolbarWindow : Window
@@ -22,16 +24,18 @@ public partial class ToolbarWindow : Window
 
     private readonly IReadOnlyList<IPlugin> _plugins;
     private readonly PluginContext _context;
+    private readonly ToolbarDisplayMode _displayMode;
     private readonly DispatcherTimer _autoCloseTimer;
 
     /// <summary>插件执行后返回文本结果时触发（参数：结果文本 + 执行上下文）。</summary>
     public event Action<string, PluginContext>? PluginResultReady;
 
-    public ToolbarWindow(IReadOnlyList<IPlugin> plugins, PluginContext context)
+    public ToolbarWindow(IReadOnlyList<IPlugin> plugins, PluginContext context, ToolbarDisplayMode displayMode = ToolbarDisplayMode.IconAndText)
     {
         InitializeComponent();
         _plugins = plugins;
         _context = context;
+        _displayMode = displayMode;
         BuildButtons();
         SourceInitialized += (_, _) => ApplyNoActivateStyle();
 
@@ -59,28 +63,36 @@ public partial class ToolbarWindow : Window
 
     private void BuildButtons()
     {
+        var showIcon = _displayMode != ToolbarDisplayMode.TextOnly;
+        var showLabel = _displayMode != ToolbarDisplayMode.IconOnly;
+
         foreach (var plugin in _plugins)
         {
             var content = new StackPanel { Orientation = Orientation.Horizontal };
 
-            var icon = new TextBlock
+            if (showIcon)
             {
-                Text = plugin.Icon,
-                FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                FontSize = 14,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 6, 0),
-                Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33)),
-            };
+                var icon = new TextBlock
+                {
+                    Text = plugin.Icon,
+                    FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                    FontSize = 14,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = showLabel ? new Thickness(0, 0, 6, 0) : new Thickness(0),
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33)),
+                };
+                content.Children.Add(icon);
+            }
 
-            var label = new TextBlock
+            if (showLabel)
             {
-                Text = plugin.Name,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-
-            content.Children.Add(icon);
-            content.Children.Add(label);
+                var label = new TextBlock
+                {
+                    Text = plugin.Name,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                content.Children.Add(label);
+            }
 
             var button = new Button
             {
@@ -88,6 +100,14 @@ public partial class ToolbarWindow : Window
                 Tag = plugin,
                 Style = (Style)FindResource("ToolbarButton"),
             };
+
+            // 仅图标模式下，悬停弹出插件文字说明。
+            if (_displayMode == ToolbarDisplayMode.IconOnly)
+            {
+                ToolTipService.SetInitialShowDelay(button, 250);
+                button.ToolTip = plugin.Name;
+            }
+
             button.Click += OnButtonClick;
             ButtonPanel.Children.Add(button);
         }

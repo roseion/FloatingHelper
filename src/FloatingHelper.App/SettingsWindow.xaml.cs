@@ -22,7 +22,42 @@ public partial class SettingsWindow : Window
         _settings = settings;
         _persist = persist;
         SearchTemplateBox.Text = settings.SearchTemplate;
+        RestoreDisplayMode(settings.DisplayMode);
         RefreshList();
+    }
+
+    /// <summary>按当前配置恢复工具栏显示模式的选中状态。</summary>
+    private void RestoreDisplayMode(ToolbarDisplayMode mode)
+    {
+        switch (mode)
+        {
+            case ToolbarDisplayMode.IconOnly:
+                ModeIconOnly.IsChecked = true;
+                break;
+            case ToolbarDisplayMode.TextOnly:
+                ModeTextOnly.IsChecked = true;
+                break;
+            default:
+                ModeIconText.IsChecked = true;
+                break;
+        }
+    }
+
+    /// <summary>显示模式单选变化时同步到配置。</summary>
+    private void OnDisplayModeChanged(object sender, RoutedEventArgs e)
+    {
+        if (ModeIconText.IsChecked == true)
+        {
+            _settings.DisplayMode = ToolbarDisplayMode.IconAndText;
+        }
+        else if (ModeIconOnly.IsChecked == true)
+        {
+            _settings.DisplayMode = ToolbarDisplayMode.IconOnly;
+        }
+        else if (ModeTextOnly.IsChecked == true)
+        {
+            _settings.DisplayMode = ToolbarDisplayMode.TextOnly;
+        }
     }
 
     private void RefreshList()

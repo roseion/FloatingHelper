@@ -19,6 +19,22 @@ public sealed class AppSettings
 
     /// <summary>是否开机自启。</summary>
     public bool AutoStart { get; set; }
+
+    /// <summary>工具栏按钮显示模式。</summary>
+    public ToolbarDisplayMode DisplayMode { get; set; } = ToolbarDisplayMode.IconAndText;
+}
+
+/// <summary>工具栏按钮显示模式。</summary>
+public enum ToolbarDisplayMode
+{
+    /// <summary>同时显示图标与文字。</summary>
+    IconAndText = 0,
+
+    /// <summary>仅显示图标，鼠标悬停弹出文字提示。</summary>
+    IconOnly = 1,
+
+    /// <summary>仅显示文字。</summary>
+    TextOnly = 2,
 }
 
 /// <summary>单个插件的持久化配置。</summary>

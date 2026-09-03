@@ -206,7 +206,7 @@ public partial class App : System.Windows.Application
     private void ShowToolbar(IReadOnlyList<IPlugin> plugins, PluginContext context, (double X, double Y) position)
     {
         _toolbar?.Close();
-        _toolbar = new ToolbarWindow(plugins, context);
+        _toolbar = new ToolbarWindow(plugins, context, _settings.DisplayMode);
         _toolbar.PluginResultReady += OnPluginResultReady;
 
         // 工具栏出现在鼠标位置附近（右下方偏移），并按鼠标所在屏幕工作区收敛，避免越界。

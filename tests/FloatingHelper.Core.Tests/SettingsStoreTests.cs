@@ -36,6 +36,7 @@ public class SettingsStoreTests : IDisposable
         Assert.False(settings.AutoStart);
         Assert.Empty(settings.Plugins);
         Assert.Equal(AppSettings.CurrentVersion, settings.Version);
+        Assert.Equal(ToolbarDisplayMode.IconAndText, settings.DisplayMode);
     }
 
     [Fact]
@@ -45,6 +46,7 @@ public class SettingsStoreTests : IDisposable
         {
             SearchTemplate = "https://example.com/search?q={0}",
             AutoStart = true,
+            DisplayMode = ToolbarDisplayMode.IconOnly,
         };
         original.Plugins["builtin.copy"] = new PluginSetting { Enabled = true };
         original.Plugins["external.demo"] = new PluginSetting { Enabled = false, Path = @"C:\demo\demo.dll" };
@@ -54,9 +56,22 @@ public class SettingsStoreTests : IDisposable
 
         Assert.Equal(original.SearchTemplate, loaded.SearchTemplate);
         Assert.True(loaded.AutoStart);
+        Assert.Equal(ToolbarDisplayMode.IconOnly, loaded.DisplayMode);
         Assert.True(loaded.Plugins["builtin.copy"].Enabled);
         Assert.False(loaded.Plugins["external.demo"].Enabled);
         Assert.Equal(@"C:\demo\demo.dll", loaded.Plugins["external.demo"].Path);
+    }
+
+    [Fact]
+    public void Save_DisplayMode_EachVariant_ShouldRoundTrip()
+    {
+        foreach (var mode in new[] { ToolbarDisplayMode.IconAndText, ToolbarDisplayMode.IconOnly, ToolbarDisplayMode.TextOnly })
+        {
+            var original = new AppSettings { DisplayMode = mode };
+            SettingsStore.Save(original, _path);
+            var loaded = SettingsStore.Load(_path);
+            Assert.Equal(mode, loaded.DisplayMode);
+        }
     }
 
     [Fact]

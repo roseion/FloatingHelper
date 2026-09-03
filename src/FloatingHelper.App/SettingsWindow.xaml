@@ -16,6 +16,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -78,14 +79,34 @@
             <Button Content="恢复默认" Padding="12,6" Margin="8,0,0,0" Click="OnRestoreDefaultClick" />
         </StackPanel>
 
-        <GroupBox Grid.Row="3" Header="搜索设置" Margin="0,16,0,0">
+        <GroupBox Grid.Row="3" Header="工具栏显示" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="ModeIconText"
+                             Content="图标 + 文字"
+                             GroupName="DisplayMode"
+                             Margin="0,4,16,0"
+                             Checked="OnDisplayModeChanged" />
+                <RadioButton x:Name="ModeIconOnly"
+                             Content="仅图标（悬停显示文字）"
+                             GroupName="DisplayMode"
+                             Margin="0,4,16,0"
+                             Checked="OnDisplayModeChanged" />
+                <RadioButton x:Name="ModeTextOnly"
+                             Content="仅文字"
+                             GroupName="DisplayMode"
+                             Margin="0,4,0,0"
+                             Checked="OnDisplayModeChanged" />
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="4" Header="搜索设置" Margin="0,16,0,0">
             <StackPanel>
                 <TextBlock Text="搜索模板（{0} 为查询词占位符）" FontSize="12" Foreground="#888888" />
                 <TextBox x:Name="SearchTemplateBox" Margin="0,6,0,0" Padding="6,4" />
             </StackPanel>
         </GroupBox>
 
-        <StackPanel Grid.Row="4"
+        <StackPanel Grid.Row="5"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,16,0,0">
