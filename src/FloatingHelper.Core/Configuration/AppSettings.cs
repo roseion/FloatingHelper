@@ -22,6 +22,12 @@ public sealed class AppSettings
 
     /// <summary>工具栏按钮显示模式。</summary>
     public ToolbarDisplayMode DisplayMode { get; set; } = ToolbarDisplayMode.IconAndText;
+
+    /// <summary>
+    /// UIA 读不到选区时（微信 / WorkBuddy 等封闭应用），是否启用剪贴板降级捕获：
+    /// 自动模拟 Ctrl+C 复制选区到剪贴板再读取，读取后恢复原剪贴板内容。
+    /// </summary>
+    public bool EnableClipboardFallback { get; set; } = true;
 }
 
 /// <summary>工具栏按钮显示模式。</summary>

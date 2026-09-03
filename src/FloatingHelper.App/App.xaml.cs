@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -29,6 +30,9 @@ public partial class App : System.Windows.Application
     private ResultPopupWindow? _resultPopup;
     private SettingsWindow? _settingsWindow;
     private Forms.NotifyIcon? _tray;
+
+    /// <summary>串行化剪贴板降级捕获，避免多次拖选并发互相干扰剪贴板。</summary>
+    private readonly object _fallbackLock = new();
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -158,11 +162,47 @@ public partial class App : System.Windows.Application
     private void OnSelectionFinished()
     {
         var selection = SelectionCaptureService.TryCapture();
-        if (selection is null)
+        if (selection is not null)
+        {
+            ShowSelectionToolbar(selection);
+            return;
+        }
+
+        // 降级捕获：UIA 不可用（微信 / WorkBuddy 等封闭应用）时，模拟 Ctrl+C 读剪贴板。
+        if (!_settings.EnableClipboardFallback)
         {
             return;
         }
 
+        Logger.Info("[选区捕获] UIA 未读到选区，尝试剪贴板降级捕获");
+        var processName = GetForegroundProcessName();
+        Task.Run(() =>
+        {
+            if (!Monitor.TryEnter(_fallbackLock))
+            {
+                return; // 已有降级捕获在跑，跳过本次避免干扰剪贴板。
+            }
+
+            try
+            {
+                var text = ClipboardCaptureService.TryCaptureSelectedText();
+                if (string.IsNullOrEmpty(text))
+                {
+                    Logger.Info("[选区捕获] 剪贴板降级捕获失败（应用可能禁止复制或无选中）");
+                    return;
+                }
+
+                Dispatcher.InvokeAsync(() => ShowSelectionToolbar(new TextSelection(text, processName)));
+            }
+            finally
+            {
+                Monitor.Exit(_fallbackLock);
+            }
+        });
+    }
+
+    private void ShowSelectionToolbar(TextSelection selection)
+    {
         // UIA 选区边界为物理像素，转换为 DIP 传给插件。
         Rect? selectionBounds = selection.Bounds is Rect physicalBounds
             ? DisplayHelper.PhysicalRectToDip(physicalBounds)
@@ -185,6 +225,27 @@ public partial class App : System.Windows.Application
         var physical = GetCursorPos();
         var position = DisplayHelper.PhysicalToDip(physical.X, physical.Y);
         Dispatcher.InvokeAsync(() => ShowToolbar(plugins, context, position));
+    }
+
+    /// <summary>获取前台窗口所属进程名，用于降级捕获结果的来源标记。</summary>
+    private static string? GetForegroundProcessName()
+    {
+        try
+        {
+            var hwnd = GetForegroundWindow();
+            if (hwnd == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            GetWindowThreadProcessId(hwnd, out var pid);
+            using var process = Process.GetProcessById((int)pid);
+            return process.ProcessName;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>左键按下时，若点击在工具栏或结果浮层外区域则关闭它们。</summary>
@@ -403,4 +464,10 @@ public partial class App : System.Windows.Application
 
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out POINT lpPoint);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 }
