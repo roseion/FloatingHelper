@@ -100,6 +100,16 @@ public partial class App : System.Windows.Application
         _pluginManager.AddBuiltin(new SmartOpenPlugin());
         _pluginManager.AddBuiltin(new SearchPlugin { SearchTemplate = _settings.SearchTemplate });
 
+        // 站点直达插件：站内搜索（小红书 / 知乎 / 微博）。
+        _pluginManager.AddBuiltin(new XiaohongshuSearchPlugin());
+        _pluginManager.AddBuiltin(new ZhihuSearchPlugin());
+        _pluginManager.AddBuiltin(new WeiboSearchPlugin());
+
+        // 站点直达插件：AI 提问（豆包 / 元宝 / DeepSeek）。
+        _pluginManager.AddBuiltin(new DoubaoAskPlugin());
+        _pluginManager.AddBuiltin(new YuanbaoAskPlugin());
+        _pluginManager.AddBuiltin(new DeepSeekAskPlugin());
+
         // 恢复插件启停状态，并为缺省配置补齐默认值。
         foreach (var plugin in _pluginManager.Plugins)
         {
