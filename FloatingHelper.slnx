@@ -9,6 +9,11 @@
     <Project Path="src/FloatingHelper.Plugins.DoubaoAsk/FloatingHelper.Plugins.DoubaoAsk.csproj" />
     <Project Path="src/FloatingHelper.Plugins.YuanbaoAsk/FloatingHelper.Plugins.YuanbaoAsk.csproj" />
     <Project Path="src/FloatingHelper.Plugins.DeepSeekAsk/FloatingHelper.Plugins.DeepSeekAsk.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.BaiduSearch/FloatingHelper.Plugins.BaiduSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.GoogleSearch/FloatingHelper.Plugins.GoogleSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.BingSearch/FloatingHelper.Plugins.BingSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.AmapSearch/FloatingHelper.Plugins.AmapSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.BaiduMapSearch/FloatingHelper.Plugins.BaiduMapSearch.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FloatingHelper.Core.Tests/FloatingHelper.Core.Tests.csproj" />

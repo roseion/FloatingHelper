@@ -1,6 +1,11 @@
 using FloatingHelper.Core.Plugins;
+using FloatingHelper.Plugins.AmapSearch;
+using FloatingHelper.Plugins.BaiduMapSearch;
+using FloatingHelper.Plugins.BaiduSearch;
+using FloatingHelper.Plugins.BingSearch;
 using FloatingHelper.Plugins.DeepSeekAsk;
 using FloatingHelper.Plugins.DoubaoAsk;
+using FloatingHelper.Plugins.GoogleSearch;
 using FloatingHelper.Plugins.WeiboSearch;
 using FloatingHelper.Plugins.XiaohongshuSearch;
 using FloatingHelper.Plugins.YuanbaoAsk;
@@ -9,7 +14,7 @@ using FloatingHelper.Plugins.ZhihuSearch;
 namespace FloatingHelper.Core.Tests;
 
 /// <summary>
-/// 六个站点直达插件的测试。每个插件是一个独立的安装包（独立项目、独立 DLL），
+/// 十一个站点直达插件的测试。每个插件是一个独立的安装包（独立项目、独立 DLL），
 /// 因此测试重点验证：
 ///   1) URL 构造正确；
 ///   2) 每个 DLL 恰好包含一个插件，可被 PluginManager 单独加载 / 启停 / 卸载（不改主程序）。
@@ -26,6 +31,11 @@ public class SitePluginsTests
         new DoubaoAskPlugin(),
         new YuanbaoAskPlugin(),
         new DeepSeekAskPlugin(),
+        new BaiduSearchPlugin(),
+        new GoogleSearchPlugin(),
+        new BingSearchPlugin(),
+        new AmapSearchPlugin(),
+        new BaiduMapSearchPlugin(),
     ];
 
     [Theory]
@@ -88,6 +98,44 @@ public class SitePluginsTests
     }
 
     [Fact]
+    public void BaiduSearchPlugin_BuildUrl_ShouldEncodeKeyword()
+    {
+        var url = new BaiduSearchPlugin().BuildUrl("测试 百度");
+        Assert.StartsWith("https://www.baidu.com/s?wd=", url);
+        Assert.DoesNotContain(" ", url);
+    }
+
+    [Fact]
+    public void GoogleSearchPlugin_BuildUrl_ShouldEncodeKeyword()
+    {
+        var url = new GoogleSearchPlugin().BuildUrl("hello world");
+        Assert.Equal("https://www.google.com/search?q=hello%20world", url);
+    }
+
+    [Fact]
+    public void BingSearchPlugin_BuildUrl_ShouldEncodeKeyword()
+    {
+        var url = new BingSearchPlugin().BuildUrl("热点 事件");
+        Assert.StartsWith("https://www.bing.com/search?q=", url);
+        Assert.DoesNotContain(" ", url);
+    }
+
+    [Fact]
+    public void AmapSearchPlugin_BuildUrl_ShouldEncodeKeyword()
+    {
+        var url = new AmapSearchPlugin().BuildUrl("广州 美食");
+        Assert.StartsWith("https://www.amap.com/search?query=", url);
+        Assert.DoesNotContain(" ", url);
+    }
+
+    [Fact]
+    public void BaiduMapSearchPlugin_BuildUrl_ShouldEncodePathKeyword()
+    {
+        var url = new BaiduMapSearchPlugin().BuildUrl("广州塔");
+        Assert.Equal("https://map.baidu.com/search/%E5%B9%BF%E5%B7%9E%E5%A1%94", url);
+    }
+
+    [Fact]
     public void AllSitePlugins_CanHandle_Blank_ShouldBeFalse()
     {
         Assert.All(AllPlugins, p => Assert.False(p.CanHandle(Ctx("   "))));
@@ -107,7 +155,7 @@ public class SitePluginsTests
     }
 
     /// <summary>
-    /// 核心验收点：六个插件是六个独立安装包（独立 DLL）。
+    /// 核心验收点：十一个插件是十一个独立安装包（独立 DLL）。
     /// 不修改主程序、不做任何注册，仅把某个插件 DLL 交给 PluginManager，
     /// 应恰好发现 1 个插件，可独立启停与卸载，与其他插件互不影响。
     /// </summary>
@@ -137,16 +185,16 @@ public class SitePluginsTests
     }
 
     /// <summary>
-    /// 六个独立 DLL 可同时放入 plugins/ 目录，一次性全部发现（模拟真实安装场景）。
+    /// 所有独立插件 DLL 可同时放入 plugins/ 目录，一次性全部发现（模拟真实安装场景）。
     /// </summary>
     [Fact]
-    public void PluginManager_LoadFromDirectory_ShouldDiscoverAllSixDlls()
+    public void PluginManager_LoadFromDirectory_ShouldDiscoverAllDlls()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "FloatingHelper_SitePlugins_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempDir);
         try
         {
-            // 把所有插件 DLL 复制到一个目录，模拟用户把六个安装包放进 plugins/。
+            // 把所有插件 DLL 复制到一个目录，模拟用户把所有安装包放进 plugins/。
             foreach (var plugin in AllPlugins)
             {
                 var dll = plugin.GetType().Assembly.Location;
@@ -156,10 +204,10 @@ public class SitePluginsTests
             var manager = new PluginManager();
             var loaded = manager.LoadFromDirectory(tempDir);
 
-            Assert.Equal(6, loaded);
+            Assert.Equal(AllPlugins.Length, loaded);
             var sitePlugins = manager.Plugins.Where(p => p.Id.StartsWith("site.", StringComparison.Ordinal)).ToList();
-            Assert.Equal(6, sitePlugins.Count);
-            Assert.Equal(6, sitePlugins.Select(p => p.Id).Distinct().Count());
+            Assert.Equal(AllPlugins.Length, sitePlugins.Count);
+            Assert.Equal(AllPlugins.Length, sitePlugins.Select(p => p.Id).Distinct().Count());
             Assert.All(sitePlugins, p => Assert.False(manager.IsBuiltin(p)));
         }
         finally
