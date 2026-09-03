@@ -129,10 +129,12 @@ public class SitePluginsTests
     }
 
     [Fact]
-    public void BaiduMapSearchPlugin_BuildUrl_ShouldEncodePathKeyword()
+    public void BaiduMapSearchPlugin_BuildUrl_ShouldEncodePathAndPrefillKeyword()
     {
         var url = new BaiduMapSearchPlugin().BuildUrl("广州塔");
-        Assert.Equal("https://map.baidu.com/search/%E5%B9%BF%E5%B7%9E%E5%A1%94", url);
+        Assert.Equal(
+            "https://map.baidu.com/search/%E5%B9%BF%E5%B7%9E%E5%A1%94?querytype=s&wd=%E5%B9%BF%E5%B7%9E%E5%A1%94",
+            url);
     }
 
     [Fact]
