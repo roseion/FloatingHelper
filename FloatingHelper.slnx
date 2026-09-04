@@ -14,6 +14,7 @@
     <Project Path="src/FloatingHelper.Plugins.BingSearch/FloatingHelper.Plugins.BingSearch.csproj" />
     <Project Path="src/FloatingHelper.Plugins.AmapSearch/FloatingHelper.Plugins.AmapSearch.csproj" />
     <Project Path="src/FloatingHelper.Plugins.BaiduMapSearch/FloatingHelper.Plugins.BaiduMapSearch.csproj" />
+    <Project Path="src/FloatingHelper.Plugins.SaveToFile/FloatingHelper.Plugins.SaveToFile.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FloatingHelper.Core.Tests/FloatingHelper.Core.Tests.csproj" />

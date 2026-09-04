@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\src\FloatingHelper.Plugins.BingSearch\FloatingHelper.Plugins.BingSearch.csproj" />
     <ProjectReference Include="..\..\src\FloatingHelper.Plugins.AmapSearch\FloatingHelper.Plugins.AmapSearch.csproj" />
     <ProjectReference Include="..\..\src\FloatingHelper.Plugins.BaiduMapSearch\FloatingHelper.Plugins.BaiduMapSearch.csproj" />
+    <ProjectReference Include="..\..\src\FloatingHelper.Plugins.SaveToFile\FloatingHelper.Plugins.SaveToFile.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@ using FloatingHelper.Plugins.BingSearch;
 using FloatingHelper.Plugins.DeepSeekAsk;
 using FloatingHelper.Plugins.DoubaoAsk;
 using FloatingHelper.Plugins.GoogleSearch;
+using FloatingHelper.Plugins.SaveToFile;
 using FloatingHelper.Plugins.WeiboSearch;
 using FloatingHelper.Plugins.XiaohongshuSearch;
 using FloatingHelper.Plugins.YuanbaoAsk;
@@ -14,9 +15,9 @@ using FloatingHelper.Plugins.ZhihuSearch;
 namespace FloatingHelper.Core.Tests;
 
 /// <summary>
-/// 十一个站点直达插件的测试。每个插件是一个独立的安装包（独立项目、独立 DLL），
-/// 因此测试重点验证：
-///   1) URL 构造正确；
+/// 十二个独立插件（十一个站点直达 + 一个本地保存）的测试。每个插件是一个独立的安装包
+/// （独立项目、独立 DLL），因此测试重点验证：
+///   1) URL / 行为构造正确；
 ///   2) 每个 DLL 恰好包含一个插件，可被 PluginManager 单独加载 / 启停 / 卸载（不改主程序）。
 /// </summary>
 public class SitePluginsTests
@@ -36,6 +37,7 @@ public class SitePluginsTests
         new BingSearchPlugin(),
         new AmapSearchPlugin(),
         new BaiduMapSearchPlugin(),
+        new SaveToFilePlugin(),
     ];
 
     [Theory]
@@ -157,7 +159,7 @@ public class SitePluginsTests
     }
 
     /// <summary>
-    /// 核心验收点：十一个插件是十一个独立安装包（独立 DLL）。
+    /// 核心验收点：十二个插件是十二个独立安装包（独立 DLL）。
     /// 不修改主程序、不做任何注册，仅把某个插件 DLL 交给 PluginManager，
     /// 应恰好发现 1 个插件，可独立启停与卸载，与其他插件互不影响。
     /// </summary>
@@ -207,10 +209,9 @@ public class SitePluginsTests
             var loaded = manager.LoadFromDirectory(tempDir);
 
             Assert.Equal(AllPlugins.Length, loaded);
-            var sitePlugins = manager.Plugins.Where(p => p.Id.StartsWith("site.", StringComparison.Ordinal)).ToList();
-            Assert.Equal(AllPlugins.Length, sitePlugins.Count);
-            Assert.Equal(AllPlugins.Length, sitePlugins.Select(p => p.Id).Distinct().Count());
-            Assert.All(sitePlugins, p => Assert.False(manager.IsBuiltin(p)));
+            Assert.Equal(AllPlugins.Length, manager.Plugins.Count);
+            Assert.Equal(AllPlugins.Length, manager.Plugins.Select(p => p.Id).Distinct().Count());
+            Assert.All(manager.Plugins, p => Assert.False(manager.IsBuiltin(p)));
         }
         finally
         {
